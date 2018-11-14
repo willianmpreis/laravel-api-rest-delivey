@@ -30,3 +30,6 @@ Route::prefix('auth')->group(function () {
 Route::middleware('auth:api')->group(function () {
     //Route::post('auth/logout', 'Auth\AuthenticatorController@logout');    
 });
+
+Route::resource('category', 'CategoryController');
+Route::resource('product', 'ProductController');
