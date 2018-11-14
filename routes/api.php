@@ -27,9 +27,8 @@ Route::prefix('auth')->group(function () {
 });
 
 
-Route::middleware('auth:api')->group(function () {
-    //Route::post('auth/logout', 'Auth\AuthenticatorController@logout');    
-});
-
-Route::resource('categories', 'CategoryController');
-Route::resource('products', 'ProductController');
+//Route::middleware('auth:api')->group(function () {
+    Route::resource('categories', 'CategoryController');
+    Route::resource('products', 'ProductController');
+    Route::resource('clients', 'ClientController');    
+//});

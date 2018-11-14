@@ -65,7 +65,7 @@ class CategoryController extends Controller
         if(!isset($category)) {
             return response()->json([
                 'message' => 'Categoria não encontrada',
-            ], 500);
+            ], 404);
         }
         return response()->json([
             'message' => 'Busca realizada com sucesso',
@@ -102,7 +102,7 @@ class CategoryController extends Controller
         if(!isset($category)) {
             return response()->json([
                 'message' => 'Categoria não encontrada',
-            ], 500);
+            ], 404);
         }
         $category->name = $request->name;
         $category->save();
@@ -124,7 +124,7 @@ class CategoryController extends Controller
         if (!isset($category)) {
             return response()->json([
                 'message' => 'Categoria não encontrada',
-            ], 500);
+            ], 404);
         }
         try {
             $category->delete();

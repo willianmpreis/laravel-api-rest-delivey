@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Product;
+use App\Client;
 
-class ProductController extends Controller
+class ClientController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,10 +14,10 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::all();
+        $clients = Client::with(['user'])->get();
         return response()->json([
             'message' => 'Busca realizada com sucesso',
-            'products' => $products
+            'clients' => $clients
         ], 201);
     }
 
@@ -43,19 +43,25 @@ class ProductController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255', 'unique:products'],
-            'price' => ['required', 'numeric', 'min:0'],
-            'category_id' => ['required','numeric', 'min:1'],
+            'cpf' => ['required', 'min:11', 'max:14'],
+            'phone' => ['required'],
+            'birth' => ['required', 'date'],
         ]);
-        $product = new Product();
-        $stock = isset($request->stock) ? $request->stock : '0';
-        $product->name = $request->name;
-        $product->price = $request->price;
-        $product->stock = $stock;
-        $product->category_id = $request->category_id;
-        $product->save();
+
+        $clients = new Client();
+
+        $clients->name  = $request->name;
+        $clients->cpf   = $request->cpf;
+        $clients->phone = $request->phone;
+        $clients->birth = $request->birth;        
+        isset($request->address) ? $clients->address = $request->address : '';
+        isset($request->photo)   ? $clients->photo   = $request->photo   : '';  
+        isset($request->user_id) ? $clients->user_id = $request->user_id : '';
+
+        $clients->save();
         return response()->json([
             'message' => 'Registrado com sucesso',
-            'product' => $product
+            'clients' => $clients
         ], 201);
     }
 
@@ -67,15 +73,15 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        $product = Product::find($id);
-        if(!isset($product)) {
+         $client = Client::find($id);
+        if(!isset($client)) {
             return response()->json([
-                'message' => 'Produto não encontrado',
+                'message' => 'Cliente não encontrado',
             ], 404);
         }
         return response()->json([
             'message' => 'Busca realizada com sucesso',
-            'product' => $product
+            'client' => $client
         ], 201);
     }
 
@@ -103,28 +109,30 @@ class ProductController extends Controller
     {
         $request->validate([
             'name' => ['string', 'max:255'],
-            'price' => ['numeric', 'min:0'],
-            'category_id' => ['numeric', 'min:1'],
+            'cpf' => ['min:11', 'max:14'],
+            'birth' => ['date']
         ]);
 
-        $product = Product::find($id);
-        if(!isset($product)) {
+        $client = Client::find($id);
+        if(!isset($client)) {
             return response()->json([
-                'message' => 'Produto não encontrado',
+                'message' => 'Cliente não encontrado',
             ], 404);
         }
 
-        if (isset($request->name)) $product->name = $request->name;
-        if (isset($request->price)) $product->price = $request->price;
-        if (isset($request->stock)) $product->stock = $request->stock;
-        if (isset($request->price)) $product->price = $request->price;
-        if (isset($request->category_id)) $product->category_id = $request->category_id;
+        if (isset($request->name)) $client->name = $request->name;
+        if (isset($request->cpf)) $client->cpf = $request->cpf;
+        if (isset($request->phone)) $client->phone = $request->phone;
+        if (isset($request->birth)) $client->birth = $request->birth;
+        if (isset($request->address)) $client->address = $request->address;
+        if (isset($request->photo)) $client->photo = $request->photo;
+        if (isset($request->user_id)) $client->user_id = $request->user_id;
         
-        $product->save();
+        $client->save();
         return response()->json([
             'message' => 'Alterado com sucesso.',
-            'product' => $product
-        ], 201);       
+            'client' => $client
+        ], 201); 
     }
 
     /**
@@ -135,16 +143,16 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-        $product = Product::find($id);
-        if (!isset($product)) {
+        $client = Client::find($id);
+        if (!isset($client)) {
             return response()->json([
-                'message' => 'Produto não encontrado',
+                'message' => 'Cliente não encontrado',
             ], 404);
         }
         try {
-            $product->delete();
+            $client->delete();
             return response()->json([
-                'message' => 'Produto deletado com sucesso',
+                'message' => 'Cliente deletado com sucesso',
             ], 202);
         } catch (Exception $e) {
             return response()->json([
