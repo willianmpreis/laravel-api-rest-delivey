@@ -31,5 +31,5 @@ Route::middleware('auth:api')->group(function () {
     //Route::post('auth/logout', 'Auth\AuthenticatorController@logout');    
 });
 
-Route::resource('category', 'CategoryController');
-Route::resource('product', 'ProductController');
+Route::resource('categories', 'CategoryController');
+Route::resource('products', 'ProductController');
