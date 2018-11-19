@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Client;
+use App\Shopping;
+use App\Product;
 
-class ClientController extends Controller
+class ShoppingController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,10 +15,15 @@ class ClientController extends Controller
      */
     public function index()
     {
-        $clients = Client::with(['user'])->get();
+        $shoppings = Shopping::with(['products'])->get();
+        if(!isset($shoppings)) {
+            return response()->json([
+                'message' => 'Nenhum pedido encontrado',
+            ], 404);
+        }
         return response()->json([
             'message' => 'Busca realizada com sucesso',
-            'clients' => $clients
+            'shoppings' => $shoppings
         ], 201);
     }
 
@@ -42,25 +48,41 @@ class ClientController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255', 'unique:products'],
-            'cpf' => ['required', 'min:11', 'max:14'],
-            'phone' => ['required'],
-            'birth' => ['required', 'date'],
+            'client_id' => ['required'],
+            'products' => ['required', 'array'],
         ]);
 
-        $clients = new Client();
+        $shopping = new Shopping();
 
-        $clients->name  = $request->name;
-        $clients->cpf   = $request->cpf;
-        $clients->phone = $request->phone;
-        $clients->birth = $request->birth;        
-        isset($request->address) ? $clients->address = $request->address : '';
-        isset($request->user_id) ? $clients->user_id = $request->user_id : '';
-        
-        $clients->save();
+        $shopping->client_id  = $request->client_id;
+        $shopping->date = now();
+
+        $products = $request->products;
+        $atach = [];       
+
+        foreach($products as $product) {
+            $productModel = Product::find($product['id']);
+            if(!isset($productModel)) {
+                continue;
+            }
+
+            $atach [$productModel->id] = [
+               'quantity' => $product['quantity'],
+               'unitary' => $productModel->price,
+               'amount' => round(($productModel->price * $product['quantity']), 2),                
+            ]; 
+        }
+
+        $shopping->save();
+
+        if (count($atach)) {
+            $shopping->products()->attach(
+                $atach
+            );
+        }
         return response()->json([
             'message' => 'Registrado com sucesso',
-            'clients' => $clients
+            'shopping' => $shopping
         ], 201);
     }
 
@@ -72,15 +94,15 @@ class ClientController extends Controller
      */
     public function show($id)
     {
-        $client = Client::with(['user'])->find($id);
-        if(!isset($client)) {
+        $shopping = Shopping::with(['products'])->find($id);
+        if(!isset($shopping)) {
             return response()->json([
-                'message' => 'Cliente não encontrado',
+                'message' => 'Pedido não encontrado',
             ], 404);
         }
         return response()->json([
             'message' => 'Busca realizada com sucesso',
-            'client' => $client
+            'shopping' => $shopping
         ], 201);
     }
 
@@ -106,31 +128,9 @@ class ClientController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'name' => ['string', 'max:255'],
-            'cpf' => ['min:11', 'max:14'],
-            'birth' => ['date']
-        ]);
-
-        $client = Client::find($id);
-        if(!isset($client)) {
-            return response()->json([
-                'message' => 'Cliente não encontrado',
-            ], 404);
-        }
-
-        if (isset($request->name)) $client->name = $request->name;
-        if (isset($request->cpf)) $client->cpf = $request->cpf;
-        if (isset($request->phone)) $client->phone = $request->phone;
-        if (isset($request->birth)) $client->birth = $request->birth;
-        if (isset($request->address)) $client->address = $request->address;
-        if (isset($request->user_id)) $client->user_id = $request->user_id;
-        
-        $client->save();
         return response()->json([
-            'message' => 'Alterado com sucesso.',
-            'client' => $client
-        ], 201); 
+            'message' => 'Não implementado',
+        ], 501);
     }
 
     /**
@@ -141,20 +141,23 @@ class ClientController extends Controller
      */
     public function destroy($id)
     {
-        $client = Client::find($id);
-        if (!isset($client)) {
+        $shopping = Shopping::with(['products'])->find($id);
+        if (!isset($shopping)) {
             return response()->json([
-                'message' => 'Cliente não encontrado',
+                'message' => 'Compra não encontrada',
             ], 404);
         }
+        
+        $shopping->products()->detach();
+        
         try {
-            $client->delete();
+            $shopping->delete();
             return response()->json([
-                'message' => 'Cliente deletado com sucesso',
+                'message' => 'Compra deletada com sucesso',
             ], 202);
         } catch (Exception $e) {
             return response()->json([
-                'message' => 'Não foi possível remover o produto selecionado.',
+                'message' => 'Não foi possível remover o registro.',
                 'exception' => $e->getMessage(),
             ], 500);
         }

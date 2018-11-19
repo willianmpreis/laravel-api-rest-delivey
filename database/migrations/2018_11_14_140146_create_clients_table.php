@@ -20,7 +20,6 @@ class CreateClientsTable extends Migration
             $table->string('phone')->nullable();
             $table->date('birth')->nullable();
             $table->string('address')->nullable();
-            $table->string('photo')->nullable();
             $table->integer('user_id')->unsigned()->nullable();
             $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();

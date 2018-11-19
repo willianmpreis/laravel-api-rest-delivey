@@ -31,6 +31,5 @@ Route::prefix('auth')->group(function () {
     Route::resource('categories', 'CategoryController');
     Route::resource('products', 'ProductController');
     Route::resource('clients', 'ClientController');    
-    Route::resource('shoppings', 'ShoppingController');    
-    Route::get('testes', 'ShoppingController@testar');    
+    Route::resource('shoppings', 'ShoppingController');        
 //});

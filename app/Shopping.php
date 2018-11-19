@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Shopping extends Model
 {
-    protected $fillable = ['client_id', 'date'];
+    protected $fillable = ['client_id', 'date', 'canceled'];
 
     function products() {
         return $this->belongsToMany("App\Product", "shopping_carts")
