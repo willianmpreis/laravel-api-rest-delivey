@@ -7,17 +7,16 @@ API REST desenvolvida para estudos do framework Laravel e utilizada como backand
 <p>O Banco segue a seguinte estrutura</p>
 <p align="center"><img src="https://github.com/willianmpreis/laravel-api-rest-delivey/blob/master/public/images/api-rest-delivery.png?raw=true" title="Modelo Relacional"></p>
 
-<p>As rotas principais são:</p>
-<p>
-//Route::middleware('auth:api')->group(function () {
-    Route::resource('categories', 'CategoryController');
-    Route::resource('products', 'ProductController');
-    Route::resource('clients', 'ClientController');    
-    Route::resource('shoppings', 'ShoppingController');        
-//});
-</p>
+<p> As rotas principais são:
+    
+ -   `Route::resource('categories', 'CategoryController');`
+ -   `Route::resource('products', 'ProductController');`
+ -   `Route::resource('clients', 'ClientController');` 
+ -   `Route::resource('shoppings', 'ShoppingController');`
+ 
+ </p>
 
-## PASSOS
+## Algumas observações iniciais do projeto.
 
 -   composer require laravel/passport
 -   php artisan migrate
